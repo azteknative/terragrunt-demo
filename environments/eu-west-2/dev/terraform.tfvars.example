@@ -1,0 +1,79 @@
+# Example terraform.tfvars file for development environment
+# Copy this file to terraform.tfvars and customize the values
+
+# Project Configuration
+project_name = "terragrunt-demo"
+environment  = "dev"
+aws_region   = "eu-west-2"
+
+# VPC Configuration (for vpc module)
+vpc_cidr = "10.0.0.0/16"
+
+availability_zones = [
+  "eu-west-2a",
+  "eu-west-2b", 
+  "eu-west-2c"
+]
+
+public_subnet_cidrs = [
+  "10.0.1.0/24",
+  "10.0.2.0/24",
+  "10.0.3.0/24"
+]
+
+private_subnet_cidrs = [
+  "10.0.10.0/24",
+  "10.0.20.0/24",
+  "10.0.30.0/24"
+]
+
+# Cost optimization for development
+enable_nat_gateway = true
+single_nat_gateway = true
+
+# VPC Flow Logs
+enable_vpc_flow_logs     = true
+flow_logs_retention_days = 7
+
+# ECS Configuration (for ecs-app module)
+service_name = "web-app"
+
+# Task sizing - development values
+task_cpu    = 256
+task_memory = 512
+
+# Scaling configuration
+desired_count = 1
+min_capacity  = 1
+max_capacity  = 3
+
+# Container configuration
+container_image = "nginx:latest"
+container_port  = 80
+
+# Health check
+health_check_path = "/"
+
+# Load balancer settings
+enable_deletion_protection = false
+
+# Auto scaling thresholds
+scale_up_threshold   = 70
+scale_down_threshold = 30
+
+# Logging
+log_retention_days = 7
+
+# Environment variables for the container
+environment_variables = {
+  ENVIRONMENT = "development"
+  LOG_LEVEL   = "debug"
+  NODE_ENV    = "development"
+}
+
+# Additional resource tags
+additional_tags = {
+  CostCenter = "development"
+  Owner      = "platform-team"
+  Purpose    = "demo-application"
+} 
