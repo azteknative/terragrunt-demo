@@ -39,8 +39,8 @@ inputs = {
   single_nat_gateway     = true  # Use single NAT gateway to save costs
   
   # VPC Flow Logs
-  enable_vpc_flow_logs        = true
-  flow_logs_retention_days    = 7  # Short retention for dev
+  enable_vpc_flow_logs        = false # Disable for the purposes of the demo
+  flow_logs_retention_days    = 7     # Short retention for dev
   
   # DNS Configuration
   enable_dns_hostnames = true
