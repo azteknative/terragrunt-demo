@@ -34,7 +34,7 @@ inputs = {
   private_subnet_ids  = dependency.vpc.outputs.private_subnet_ids
   
   # ECS Configuration - smaller for dev environment
-  cluster_name = null  # Will use default naming
+  # cluster_name = null  # Will use default naming
   service_name = "web-app"
   
   # Task Configuration - minimal resources for dev
