@@ -98,8 +98,12 @@ Each environment (dev/prod) has its own:
 
 ### Deploy Everything
 ```bash
-# From repository root
-terragrunt run-all apply --terragrunt-working-dir environments/eu-west-2/dev
+# From repository root - uses terragrunt run-all with automatic dependency resolution
+./scripts/deploy.sh -a apply -c all -e dev
+
+# Traditional terragrunt approach from environment directory
+cd environments/eu-west-2/dev
+terragrunt run-all apply
 ```
 
 ### Deploy Specific Module
@@ -110,11 +114,19 @@ terragrunt apply
 
 ### Plan Changes
 ```bash
+# Plan all components with dependency resolution
+./scripts/deploy.sh -a plan -c all -e dev
+
+# Plan specific component
 terragrunt plan
 ```
 
 ### Destroy Infrastructure
 ```bash
+# Destroy all components in correct reverse dependency order
+./scripts/deploy.sh -a destroy -c all -e dev
+
+# Destroy specific component
 terragrunt destroy
 ```
 

@@ -80,14 +80,23 @@ terragrunt apply
 
 #### Using the Deployment Script
 ```bash
-# Plan all components in dev
+# Plan all components with automatic dependency resolution
 ./scripts/deploy.sh -a plan -c all -e dev
 
-# Apply VPC only in dev
-./scripts/deploy.sh -a apply -c vpc -e dev
-
-# Apply everything in dev
+# Apply all components - VPC first, then ECS (automatic ordering)
 ./scripts/deploy.sh -a apply -c all -e dev
+
+# Destroy all components - ECS first, then VPC (automatic reverse ordering)
+./scripts/deploy.sh -a destroy -c all -e dev
+```
+
+#### Manual Terragrunt Commands
+```bash
+# From environment directory - terragrunt handles dependencies automatically
+cd environments/eu-west-2/dev
+terragrunt run-all plan    # Plans all with dependency resolution
+terragrunt run-all apply   # Applies in correct order
+terragrunt run-all destroy # Destroys in reverse order
 ```
 
 ### 4. Key Features Showcase (10 minutes)

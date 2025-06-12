@@ -8,9 +8,12 @@ terraform {
   source = "../../../../modules/ecs-fargate"
 }
 
-# Dependency on VPC
+# Dependency on VPC - this ensures proper ordering for create/destroy operations
 dependency "vpc" {
   config_path = "../vpc"
+  
+  # Skip outputs during destroy to avoid dependency issues
+  skip_outputs = true
   
   mock_outputs = {
     vpc_id              = "vpc-12345678"
@@ -18,7 +21,7 @@ dependency "vpc" {
     private_subnet_ids  = ["subnet-22222222", "subnet-33333333", "subnet-44444444"]
   }
   
-  mock_outputs_allowed_terraform_commands = ["validate", "plan"]
+  mock_outputs_allowed_terraform_commands = ["validate", "plan", "destroy"]
 }
 
 # Override inputs for production environment
@@ -53,7 +56,6 @@ inputs = {
   
   # Load Balancer Configuration
   enable_deletion_protection = true   # Protect against accidental deletion
-  certificate_arn           = null    # Would be set to ACM certificate ARN for HTTPS
   
   # Auto Scaling Thresholds - more conservative for production
   scale_up_threshold   = 60   # Scale up earlier

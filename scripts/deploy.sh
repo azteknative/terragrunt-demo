@@ -31,8 +31,12 @@ usage() {
     echo ""
     echo "Examples:"
     echo "  $0 -a plan -c vpc -e dev"
-    echo "  $0 -a apply -c all -e dev"
+    echo "  $0 -a apply -c all -e dev      # Uses terragrunt run-all with dependency resolution"
+    echo "  $0 -a destroy -c all -e dev    # Destroys in correct reverse dependency order"
     echo "  $0 -a destroy -c ecs-app -e prod"
+    echo ""
+    echo "Note: When using -c all, terragrunt automatically handles dependency ordering"
+    echo "      VPC will be created first, destroyed last"
     exit 1
 }
 
@@ -130,15 +134,51 @@ execute_terragrunt() {
 # Function to deploy all components
 deploy_all() {
     local action=$1
+    local env_path="environments/${REGION}/${ENVIRONMENT}"
     
-    print_status "Deploying all components in $ENVIRONMENT environment"
+    if [ ! -d "$env_path" ]; then
+        print_error "Environment path $env_path does not exist"
+        exit 1
+    fi
     
-    # Deploy VPC first
-    execute_terragrunt "vpc" "$action"
+    print_status "Using terragrunt run-all for $action in $ENVIRONMENT environment"
+    print_status "Terragrunt will automatically handle dependency ordering"
     
-    # Deploy ECS application (depends on VPC)
-    execute_terragrunt "ecs-app" "$action"
+    cd "$env_path"
     
+    case $action in
+        "plan")
+            print_status "Planning all components with dependency resolution"
+            terragrunt run-all plan
+            ;;
+        "apply")
+            print_status "Applying all components with dependency resolution"
+            terragrunt run-all apply
+            ;;
+        "destroy")
+            print_warning "This will destroy ALL resources in the $ENVIRONMENT environment!"
+            print_status "Terragrunt will destroy in reverse dependency order automatically"
+            read -p "Are you sure you want to destroy everything? (yes/no): " confirmation
+            if [ "$confirmation" = "yes" ]; then
+                terragrunt run-all destroy
+            else
+                print_status "Destroy cancelled"
+                cd - > /dev/null
+                return 0
+            fi
+            ;;
+        "validate")
+            print_status "Validating all components"
+            terragrunt run-all validate
+            ;;
+        *)
+            print_error "Unknown action: $action"
+            cd - > /dev/null
+            exit 1
+            ;;
+    esac
+    
+    cd - > /dev/null
     print_success "All components processed successfully"
 }
 
